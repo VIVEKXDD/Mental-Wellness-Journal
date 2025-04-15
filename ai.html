@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="talAiApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TAL AI</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+      body {
+          margin: 0;
+          font-family: "Poppins", sans-serif;
+          background: #0f0f0f;
+          color: #e0e0e0;
+          transition: background-color 0.3s ease;
+      }
+  
+      .container {
+          display: flex;
+          height: 100vh;
+      }
+  
+      .sidebar {
+          width: 250px;
+          background: #181818;
+          padding: 30px 20px;
+          box-sizing: border-box;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          z-index: 10;
+      }
+  
+      .sidebar:hover {
+          transform: translateX(5px);
+          box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+      }
+  
+      .logo {
+          display: flex;
+          align-items: center;
+          margin-bottom: 40px;
+          transition: transform 0.3s ease;
+      }
+  
+      .logo:hover {
+          transform: scale(1.05);
+      }
+  
+      .logo img {
+          width: 60px;
+          margin-right: 15px;
+          border-radius: 50%;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .logo img:hover {
+          box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+      }
+  
+      .nav a {
+          display: block;
+          padding: 12px 15px;
+          text-decoration: none;
+          color: #ffffff;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+  
+      .nav a.active,
+      .nav a:hover {
+          background-color: #333333;
+          transform: scale(1.02);
+      }
+  
+      .content {
+          flex: 1;
+          padding: 30px;
+          box-sizing: border-box;
+          transition: background-color 0.3s ease;
+          position: relative;
+      }
+  
+      .content::before, .content::after {
+          content: '';
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          filter: blur(50px);
+          z-index: 0;
+          opacity: 0.2;
+          pointer-events: none;
+      }
+  
+      .content::before {
+          top: -50px;
+          left: -50px;
+          background: radial-gradient(circle, rgba(74, 144, 226, 0.3), transparent);
+      }
+  
+      .content::after {
+          bottom: -50px;
+          right: -50px;
+          background: radial-gradient(circle, rgba(229, 115, 115, 0.3), transparent);
+      }
+  
+      .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+          position: relative;
+          z-index: 1;
+      }
+  
+      .search {
+          padding: 10px;
+          border-radius: 8px;
+          border: none;
+          width: 300px;
+          font-size: 1em;
+          background: #252525;
+          color: #ffffff;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .search:focus {
+          outline: none;
+          box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+      }
+  
+      .user-profile {
+          display: flex;
+          align-items: center;
+      }
+  
+      .user-profile span {
+          margin-right: 15px;
+      }
+  
+      .user-profile img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .user-profile img:hover {
+          box-shadow: 0 2px 5px rgba(255, 255, 255, 0.3);
+      }
+  
+      .tal-ai-section {
+          text-align: center;
+          position: relative;
+          z-index: 1;
+      }
+  
+      .ai-visual img {
+          width: 250px;
+          margin: 20px 0;
+          transition: transform 0.3s ease;
+      }
+  
+      .ai-visual img:hover {
+          transform: scale(1.03);
+      }
+  
+      .chat-container {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          position: relative;
+          z-index: 1;
+      }
+  
+      .chat-messages {
+          width: 60%;
+          text-align: left;
+          height: 300px;
+          background-color: #252525;
+          padding: 10px;
+          border-radius: 8px;
+          transition: box-shadow 0.3s ease;
+          overflow: hidden; /* Prevent internal scrollbars */
+      }
+  
+      .chat-messages:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+  
+      .recent-chats {
+          width: 35%;
+          text-align: left;
+          background-color: #333333;
+          padding: 10px;
+          border-radius: 8px;
+          transition: box-shadow 0.3s ease;
+          overflow: hidden; /* Prevent internal scrollbars */
+      }
+  
+      .recent-chats:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+  
+      .recent-chats h3 {
+          margin-top: 0;
+          color: #ffffff;
+      }
+  
+      .recent-chat {
+          margin-bottom: 5px;
+          cursor: pointer;
+          color: #ffffff;
+          transition: color 0.3s ease;
+      }
+  
+      .recent-chat:hover {
+          color: #b0b0b0;
+      }
+  
+      .input-area {
+          display: flex;
+          position: relative;
+          z-index: 1;
+      }
+  
+      .input-area input {
+          flex: 1;
+          padding: 10px;
+          border: none;
+          border-radius: 8px 0 0 8px;
+          background-color: #252525;
+          color: #ffffff;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .input-area input:focus {
+          outline: none;
+          box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+      }
+  
+      .input-area button {
+          padding: 10px 15px;
+          border: none;
+          border-radius: 0 8px 8px 0;
+          background-color: #4a90e2;
+          color: white;
+          cursor: pointer;
+          transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+  
+      .input-area button:hover {
+          background-color: #3578c4;
+          transform: scale(1.05);
+      }
+  
+      .message {
+          margin-bottom: 10px;
+          color: #ffffff;
+      }
+  
+      .sender {
+          font-weight: bold;
+          margin-right: 5px;
+          color: #ffffff;
+      }
+  
+      .gradient-text {
+          background: linear-gradient(to right, #4a90e2, #e57373);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: bold;
+          font-size: 2em;
+          transition: transform 0.3s ease;
+          display: inline-block;
+      }
+  
+      .gradient-text:hover {
+          transform: scale(1.03);
+      }
+  
+      .header h2, .recent-chats h3 {
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+  
+      .search, .chat-messages, .recent-chats, .input-area input {
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+  
+      .input-area {
+          border-radius: 8px;
+          overflow: hidden; 
+      }
+  
+     
+      .chat-messages, .recent-chats {
+          border: 1px solid #333;
+      }
+  
+      .message {
+          animation: fadeIn 0.5s ease-in-out;
+      }
+  
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+              transform: translateY(10px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+  
+      
+      .input-area button, .nav a {
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+  
+      .logo img {
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      }
+  </style>
+  </head>
+  <body ng-controller="TalAiController">
+    <div class="container">
+        <aside class="sidebar">
+          <div class="logo">
+            <img src="SHOGOAsset 3LOGO.png" alt="App Logo" />
+            <span class="gradient-text">Wellness Hub</span>
+          </div>
+          <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="journalling.html">Journaling</a>
+            <a href="therapist.html">Therapist</a>
+            <a href="meditation.html">Zen Mode</a>
+            <a href="ai.html" class="active">TAL AI</a>
+            <a href="panic.html">Panic Button</a>
+            <a href="landing.html">Logout</a>
+          </div>
+        </aside>
+    <div class="content">
+      <main class="content">
+        <section class="tal-ai-section">
+          <h2>TAL AI</h2>
+          <div class="chat-container">
+            <div class="chat-messages">
+              <div class="message" ng-repeat="message in chatMessages">
+                <span class="sender">{{ message.sender }}:</span>
+                <span class="text">{{ message.text }}</span>
+              </div>
+            </div>
+            <div class="recent-chats">
+              <h3>Recent Chats</h3>
+              <div
+                class="recent-chat"
+                ng-repeat="recent in recentChats"
+                ng-click="loadRecentChat(recent)"
+              >
+                {{ recent.question }}
+              </div>
+            </div>
+          </div>
+          <div class="input-area">
+            <input
+              type="text"
+              placeholder="Ask TAL AI"
+              ng-model="userQuestion"
+            />
+            <button ng-click="askAi()">Send</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+      angular
+        .module("talAiApp", [])
+        .controller("TalAiController", function ($scope, $http) {
+          $scope.chatMessages = [];
+          $scope.recentChats = [];
+          $scope.userQuestion = "";
+          $scope.isLoading = false;
+          const userId = "demoUser123";
+
+          function loadChatHistory() {
+            $http
+              .get(`http://localhost:5000/api/chat/${userId}`)
+              .then((response) => {
+                $scope.chatMessages = response.data;
+              })
+              .catch((error) => {
+                console.error("❌ Error fetching chat history:", error);
+              });
+          }
+
+          $scope.askAi = function () {
+            if ($scope.userQuestion.trim() === "") return;
+
+            const userMessage = $scope.userQuestion;
+            $scope.chatMessages.push({ sender: "You", text: userMessage });
+            $scope.userQuestion = "";
+            $scope.isLoading = true;
+
+            $http
+              .post("http://localhost:5000/api/chat", { userId, userMessage })
+              .then((response) => {
+                const aiResponse =
+                  response.data.aiResponse ||
+                  "I'm sorry, I didn't understand that.";
+                $scope.chatMessages.push({
+                  sender: "TAL AI",
+                  text: aiResponse,
+                });
+                $scope.recentChats.push({
+                  question: userMessage,
+                  answer: aiResponse,
+                });
+              })
+              .catch((error) => {
+                console.error(
+                  "❌ AI API Error:",
+                  error.response ? error.response.data : error
+                );
+                alert("AI service is currently unavailable. Try again later.");
+              })
+              .finally(() => {
+                $scope.isLoading = false;
+              });
+          };
+
+          $scope.loadRecentChat = function (recentChat) {
+            if (
+              !$scope.chatMessages.some(
+                (msg) => msg.text === recentChat.question
+              )
+            ) {
+              $scope.chatMessages.push({
+                sender: "You",
+                text: recentChat.question,
+              });
+              $scope.chatMessages.push({
+                sender: "TAL AI",
+                text: recentChat.answer,
+              });
+            }
+          };
+
+          loadChatHistory();
+        });
+    </script>
+  </body>
+</html>

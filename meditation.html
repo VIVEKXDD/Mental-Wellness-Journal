@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="zenApp">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zen Mode</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #181818;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            color: #ffffff;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            width: 60px;
+            margin-right: 15px;
+            border-radius: 50%;
+        }
+
+        .nav a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a.active,
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile span {
+            margin-right: 15px;
+        }
+
+        .profile-timer-container {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .profile-timer-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .zen-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zen-icon-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+
+        .zen-icon-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            z-index: 1;
+        }
+
+        .zen-icon-wrapper .zen-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            z-index: 2;
+        }
+
+        .circle-orbit {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            animation: orbit 6s linear infinite;
+            top: 0;
+            left: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .orbiting-circle {
+            width: 10px;
+            height: 10px;
+            background-color: #4a90e2;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes orbit {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .centered-timer {
+            font-size: 1.5em;
+            color: #eee;
+            margin-bottom: 20px;
+        }
+
+        .zen-input {
+            padding: 10px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 80px;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .zen-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        .zen-button:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+
+<body ng-controller="ZenController">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="SHOGOAsset 3LOGO.png" alt="App Logo" />
+                <span>Wellness Hub</span>
+            </div>
+            <div class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journalling.html">Journaling</a>
+                <a href="therapist.html">Therapist</a>
+                <a href="meditation.html" class="active">Zen Mode</a>
+                <a href="ai.html">TAL AI</a>
+                <a href="panic.html">Panic Button</a>
+                <a href="landing.html">Logout</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="header">
+                <div class="user-profile">
+                    <span>User Name</span>
+                    <div class="profile-timer-container">
+                        <img src="https://via.placeholder.com/50" alt="User Avatar" />
+                    </div>
+                </div>
+            </header>
+
+            <section class="zen-section">
+                <div class="zen-icon-wrapper">
+                    <canvas id="timerCanvas"></canvas>
+                    <div class="zen-icon">🧘</div>
+                    <div class="circle-orbit">
+                        <div class="orbiting-circle"></div>
+                    </div>
+                </div>
+
+                <div class="centered-timer">{{ formattedTime }}</div>
+
+                <div>
+                    <input
+                        type="number"
+                        ng-model="minutes"
+                        class="zen-input"
+                        placeholder="Minutes"
+                        min="0"
+                    />
+                    <input
+                        type="number"
+                        ng-model="seconds"
+                        class="zen-input"
+                        placeholder="Seconds"
+                        min="0"
+                        max="59"
+                    />
+                </div>
+
+                <div>
+                    <button
+                        class="zen-button"
+                        ng-click="startTimer()"
+                        ng-disabled="isRunning"
+                    >
+                        Start
+                    </button>
+                    <button
+                        class="zen-button"
+                        ng-click="stopTimer()"
+                        ng-disabled="!isRunning"
+                    >
+                        Stop
+                    </button>
+                    <button class="zen-button" ng-click="restartTimer()">
+                        Restart
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        angular
+            .module("zenApp", [])
+            .controller("ZenController", function ($scope, $interval) {
+                $scope.minutes = 30;
+                $scope.seconds = 0;
+                $scope.time = $scope.minutes * 60 + $scope.seconds;
+                $scope.formattedTime = formatTime($scope.time);
+                $scope.isRunning = false;
+                let timerPromise;
+
+                const canvas = document.getElementById("timerCanvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = 150;
+                canvas.height = 150;
+                const radius = canvas.width / 2 - 8;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const primaryColor = "#4a90e2";
+                const backgroundColor = "rgba(51, 51, 51, 0.7)";
+                const borderWidth = 8;
+
+                function formatTime(seconds) {
+                    let minutes = Math.floor(seconds / 60);
+                    let remainingSeconds = seconds % 60;
+                    return `${minutes
+                        .toString()
+                        .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+                }
+
+                function drawTimer(percent) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = backgroundColor;
+                    ctx.lineWidth = borderWidth;
+                    ctx.lineCap = "round";
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(
+                        centerX,
+                        centerY,
+                        radius,
+                        -Math.PI / 2,
+                        -Math.PI / 2 + 2 * Math.PI * percent
+                    );
+                    ctx.strokeStyle = primaryColor;
+                    ctx.lineWidth = borderWidth;
+                    ctx.lineCap = "round";
+                    ctx.stroke();
+                }
+
+                $scope.startTimer = function () {
+                    $scope.time =
+                        parseInt($scope.minutes) * 60 + parseInt($scope.seconds);
+                    if (isNaN($scope.time) || $scope.time < 0) {
+                        $scope.time = 0;
+                        $scope.minutes = 0;
+                        $scope.seconds = 0;
+                        $scope.formattedTime = formatTime(0);
+                        return;
+                    }
+                    $scope.initialTime = $scope.time;
+                    $scope.isRunning = true;
+                    drawTimer(1);
+                    timerPromise = $interval(function () {
+                        if ($scope.time > 0) {
+                            $scope.time--;
+                            $scope.formattedTime = formatTime($scope.time);
+                            let percentage = 1 - $scope.time / $scope.initialTime;
+                            drawTimer(percentage);
+                        } else {
+                            $scope.stopTimer();
+                            drawTimer(1);
+                        }
+                    }, 1000);
+                };
+
+                $scope.stopTimer = function () {
+                    $scope.isRunning = false;
+                    $interval.cancel(timerPromise);
+                };
+
+                $scope.restartTimer = function () {
+                    $scope.stopTimer();
+                    $scope.time =
+                        parseInt($scope.minutes) * 60 + parseInt($scope.seconds);
+                    if (isNaN($scope.time) || $scope.time < 0) {
+                        $scope.time = 0;
+                        $scope.minutes = 0;
+                        $scope.seconds = 0;
+                        $scope.formattedTime = formatTime(0);
+                        return;
+                    }
+                    $scope.initialTime = $scope.time;
+                    $scope.formattedTime = formatTime($scope.time);
+                    drawTimer(0);
+                };
+
+                drawTimer(0);
+            });
+    </script>
+</body>
+</html>

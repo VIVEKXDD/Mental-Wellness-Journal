@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="therapistApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Therapist Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* More modern font */
+        background: #121212; /* Darker background */
+        color: #f0f0f0; /* Lighter text */
+        line-height: 1.6;
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 280px; /* Slightly wider sidebar */
+        background: #1e1e1e; /* Darker sidebar */
+        padding: 40px 25px; /* More padding */
+        box-sizing: border-box;
+        color: #ffffff;
+        border-right: 1px solid #333; /* Subtle separator */
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 50px; /* More space */
+      }
+
+      .logo img {
+        width: 70px; /* Slightly larger logo */
+        margin-right: 20px;
+        border-radius: 10px; /* Softer logo corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav a {
+        display: block;
+        padding: 15px 20px; /* More padding */
+        text-decoration: none;
+        color: #d1d1d1; /* Slightly softer white */
+        border-radius: 10px;
+        margin-bottom: 12px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .nav a.active,
+      .nav a:hover {
+        background-color: #373737;
+        color: #5cb85c; /* Accent color for active/hover */
+      }
+
+      .content {
+        flex: 1;
+        padding: 40px;
+        box-sizing: border-box;
+        position: relative; /* For absolute positioning of the add button */
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+
+      .search {
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid #333; /* Add a subtle border */
+        width: 350px; /* Slightly wider search */
+        font-size: 1em;
+        background: #252525;
+        color: #ffffff;
+        transition: border-color 0.3s ease;
+      }
+
+      .search:focus {
+        outline: none;
+        border-color: #5cb85c; /* Accent color on focus */
+      }
+
+      .therapist-section {
+        background: #1e1e1e;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+        margin-bottom: 20px; /* Added margin */
+      }
+
+      .therapist-section h2 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #5cb85c; /* Accent underline */
+        padding-bottom: 10px;
+      }
+
+      .therapist-card {
+        display: flex;
+        align-items: center;
+        padding: 20px; /* More padding */
+        border-bottom: 1px solid #333;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .therapist-card:last-child {
+        border-bottom: none;
+      }
+
+      .therapist-card:hover {
+        background-color: #2a2a2a;
+      }
+
+      .therapist-card img {
+        width: 70px; /* Slightly larger image */
+        height: 70px;
+        border-radius: 10px; /* Softer image corners */
+        margin-right: 20px;
+        object-fit: cover; /* Ensure image fills the container */
+      }
+
+      .therapist-card .details h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1.2em;
+        margin-bottom: 5px;
+      }
+
+      .therapist-card .details p {
+        margin: 0;
+        color: #b0b0b0;
+        font-size: 0.9em;
+      }
+
+      .therapist-details {
+        background: #252525;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        margin-bottom: 20px;
+        color: #f0f0f0;
+      }
+
+      .therapist-details h2 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #5cb85c;
+        padding-bottom: 10px;
+      }
+
+      .therapist-details p {
+        margin-bottom: 15px;
+      }
+
+      .details-buttons button {
+        background-color: #373737;
+        color: #d1d1d1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .details-buttons button:hover {
+        background-color: #5cb85c;
+        color: white;
+      }
+
+      .reviews-container {
+        background: #1e1e1e;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+      }
+
+      .reviews-container h3 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #5cb85c;
+        padding-bottom: 10px;
+      }
+
+      .reviews-container ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .reviews-container li {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border-left: 3px solid #5cb85c; /* Highlight for reviews */
+      }
+
+      .reviews-container li .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+        color: #d1d1d1;
+        font-size: 0.9em;
+      }
+
+      .reviews-container li .review-header .rating {
+        color: #f0ad4e; /* Gold color for rating */
+      }
+
+      .reviews-container li .comment {
+        color: #b0b0b0;
+      }
+
+      .add-therapist-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s ease;
+      }
+
+      .add-therapist-button:hover {
+        background-color: #4cae4c;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .modal-content {
+        background-color: #252525;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #333;
+        width: 80%; /* Could be more or less, depending on screen size */
+        border-radius: 10px;
+        color: #f0f0f0;
+        position: relative;
+      }
+
+      .modal-content h2 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #5cb85c;
+        padding-bottom: 10px;
+      }
+
+      .close-button {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close-button:hover,
+      .close-button:focus {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        color: #d1d1d1;
+        margin-bottom: 5px;
+      }
+
+      .form-group input[type="text"],
+      .form-group input[type="number"],
+      .form-group input[type="email"],
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background: #252525;
+        color: #ffffff;
+        box-sizing: border-box;
+      }
+
+      .modal-content button[type="submit"] {
+        background-color: #5cb85c;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .modal-content button[type="submit"]:hover {
+        background-color: #4cae4c;
+      }
+
+      .active-button {
+        background-color: #007bff; /* Blue color for active button */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .active-button:hover {
+        background-color: #0056b3;
+      }
+
+      .therapist-info-modal {
+        display: none;
+        position: fixed;
+        z-index: 1002; /* Higher than the add therapist modal */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .therapist-info-modal-content {
+        background-color: #252525;
+        margin: 10% auto; /* Adjust top margin as needed */
+        padding: 20px;
+        border: 1px solid #333;
+        width: 80%; /* Adjust width as needed */
+        border-radius: 10px;
+        color: #f0f0f0;
+        position: relative;
+      }
+
+      .therapist-info-modal-content h2 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #5cb85c;
+        padding-bottom: 10px;
+      }
+
+      .therapist-info-modal-content .close-button {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .therapist-info-modal-content .close-button:hover,
+      .therapist-info-modal-content .close-button:focus {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .therapist-info-modal-content p {
+        margin-bottom: 15px;
+      }
+
+      .therapist-info-modal-content .details-buttons button {
+        background-color: #373737;
+        color: #d1d1d1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .therapist-info-modal-content .details-buttons button:hover {
+        background-color: #5cb85c;
+        color: white;
+      }
+
+      .therapist-info-modal-content .availability {
+        margin-top: 20px;
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .therapist-info-modal-content .availability h3 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #5cb85c;
+        padding-bottom: 5px;
+      }
+
+      .therapist-info-modal-content .reviews-container {
+        margin-top: 20px;
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .therapist-info-modal-content .reviews-container h3 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #5cb85c;
+        padding-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body ng-controller="TherapistController">
+    <div class="container">
+      <aside class="sidebar">
+        <div class="logo">
+          <img
+            src="SHOGOAsset 3LOGO.png"
+            alt="Wellness Hub"
+          />
+          <span>Wellness Hub</span>
+        </div>
+        <div class="nav">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="journalling.html">Journaling</a>
+          <a href="therapist.html" class="active">Therapist</a>
+          <a href="meditation.html">Zen Mode</a>
+          <a href="ai.html">TAL AI</a>
+          <a href="panic.html">Panic Button</a>
+          <a href="landing.html">Logout</a>
+        </div>
+      </aside>
+      <main class="content">
+        <header class="header">
+          <input
+            type="text"
+            placeholder="Search Therapists"
+            class="search"
+            ng-model="searchQuery"
+          />
+        </header>
+
+        <section class="therapist-section">
+          <h2>Available Therapists</h2>
+          <div
+            class="therapist-card"
+            ng-repeat="therapist in therapists | filter:searchQuery"
+            ng-click="openTherapistInfoModal(therapist.id)"
+          >
+            <img ng-src="{{ therapist.image }}" alt="{{ therapist.name }}" />
+            <div class="details">
+              <h3>{{ therapist.name }}</h3>
+              <p>{{ therapist.specialization }}</p>
+            </div>
+          </div>
+        </section>
+
+        <div id="therapistInfoModal" class="therapist-info-modal">
+          <div class="therapist-info-modal-content">
+            <span class="close-button" ng-click="closeTherapistInfoModal()"
+              >&times;</span
+            >
+            <h2 ng-if="selectedTherapistInfo">
+              {{ selectedTherapistInfo.name }}
+            </h2>
+            <p ng-if="selectedTherapistInfo">
+              <strong>Specialization:</strong> {{
+              selectedTherapistInfo.specialization }}
+            </p>
+            <p ng-if="selectedTherapistInfo">
+              <strong>Experience:</strong> {{ selectedTherapistInfo.experience
+              }} years
+            </p>
+            <p ng-if="selectedTherapistInfo && selectedTherapistInfo.bio">
+              <strong>Bio:</strong> {{ selectedTherapistInfo.bio }}
+            </p>
+            <p ng-if="selectedTherapistInfo">
+              <strong>Email:</strong> {{ selectedTherapistInfo.email }}
+            </p>
+            <p ng-if="selectedTherapistInfo && selectedTherapistInfo.phone">
+              <strong>Phone:</strong> {{ selectedTherapistInfo.phone }}
+            </p>
+            <p ng-if="selectedTherapistInfo && selectedTherapistInfo.location">
+              <strong>Location:</strong> {{ selectedTherapistInfo.location }}
+            </p>
+
+            <div class="details-buttons" ng-if="selectedTherapistInfo">
+              <button ng-click="loadAvailability(selectedTherapistInfo.id)">
+                Show Availability
+              </button>
+              <button ng-click="loadReviews(selectedTherapistInfo.id)">
+                Show Reviews
+              </button>
+              <a class="active-button" href="#">Active Button</a>
+              <button ng-click="openEditTherapist(selectedTherapistInfo)">
+                Edit Therapist
+              </button>
+              <button ng-click="deleteTherapist(selectedTherapistInfo.id)">
+                Delete Therapist
+              </button>
+            </div>
+
+            <div
+              class="availability"
+              ng-if="selectedAvailability && selectedAvailability.length > 0"
+            >
+              <h3>Availability</h3>
+              <ul>
+                <li ng-repeat="slot in selectedAvailability">
+                  {{ slot.day }}: {{ slot.timeSlot }}
+                </li>
+              </ul>
+            </div>
+            <p
+              class="availability"
+              ng-if="selectedAvailability && selectedAvailability.length === 0"
+            >
+              No availability information available.
+            </p>
+
+            <div
+              class="reviews-container"
+              ng-if="selectedReviews && selectedReviews.length > 0"
+            >
+              <h3>Reviews</h3>
+              <ul>
+                <li ng-repeat="review in selectedReviews">
+                  <div class="review-header">
+                    <span>User: {{ review.userId }}</span>
+                    <span class="rating">Rating: {{ review.rating }}/5</span>
+                    <span class="date"
+                      >{{ review.date | date:'MMM d, yyyy' }}</span
+                    >
+                  </div>
+                  <p class="comment">{{ review.comment }}</p>
+                </li>
+              </ul>
+            </div>
+            <p
+              class="reviews-container"
+              ng-if="selectedReviews && selectedReviews.length === 0"
+            >
+              No reviews yet.
+            </p>
+          </div>
+        </div>
+
+        <button class="add-therapist-button" ng-click="openAddTherapistModal()">
+          +
+        </button>
+
+        <div id="addTherapistModal" class="modal">
+          <div class="modal-content">
+            <span class="close-button" ng-click="closeAddTherapistModal()"
+              >&times;</span
+            >
+            <h2>Add New Therapist</h2>
+            <form ng-submit="addTherapist()"></form>
+          </div>
+        </div>
+
+        <div id="editTherapistModal" class="modal">
+          <div class="modal-content">
+            <span class="close-button" ng-click="closeEditTherapistModal()"
+              >&times;</span
+            >
+            <h2>Edit Therapist</h2>
+            <form ng-submit="updateTherapist(selectedTherapistInfo.id)">
+              <div class="form-group">
+                <label for="editName">Name:</label>
+                <input
+                  type="text"
+                  id="editName"
+                  ng-model="selectedTherapistInfo.name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="editSpecialization">Specialization:</label>
+                <input
+                  type="text"
+                  id="editSpecialization"
+                  ng-model="selectedTherapistInfo.specialization"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="editExperience">Experience (Years):</label>
+                <input
+                  type="number"
+                  id="editExperience"
+                  ng-model="selectedTherapistInfo.experience"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="editEmail">Email:</label>
+                <input
+                  type="email"
+                  id="editEmail"
+                  ng-model="selectedTherapistInfo.email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="editPhone">Phone:</label>
+                <input
+                  type="text"
+                  id="editPhone"
+                  ng-model="selectedTherapistInfo.phone"
+                />
+              </div>
+              <div class="form-group">
+                <label for="editLocation">Location:</label>
+                <input
+                  type="text"
+                  id="editLocation"
+                  ng-model="selectedTherapistInfo.location"
+                />
+              </div>
+              <div class="form-group">
+                <label for="editBio">Bio:</label>
+                <textarea
+                  id="editBio"
+                  ng-model="selectedTherapistInfo.bio"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="editImage">Image URL:</label>
+                <input
+                  type="text"
+                  id="editImage"
+                  ng-model="selectedTherapistInfo.image"
+                />
+              </div>
+              <button type="submit">Update Therapist</button>
+              <p class="success-message" ng-if="updateSuccessMessage">
+                {{ updateSuccessMessage }}
+              </p>
+              <p class="error-message" ng-if="updateErrorMessage">
+                {{ updateErrorMessage }}
+              </p>
+            </form>
+
+            <div class="availability">
+              <h3>Manage Availability</h3>
+              <form ng-submit="addAvailability(selectedTherapistInfo.id)">
+                <div class="form-group">
+                  <label for="day">Day:</label>
+                  <input
+                    type="text"
+                    id="day"
+                    ng-model="newAvailability.day"
+                    placeholder="e.g., Monday"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="timeSlot">Time Slot:</label>
+                  <input
+                    type="text"
+                    id="timeSlot"
+                    ng-model="newAvailability.timeSlot"
+                    placeholder="e.g., 9:00 AM - 10:00 AM"
+                    required
+                  />
+                </div>
+                <button type="submit">Add Availability</button>
+                <p class="success-message" ng-if="availabilitySuccessMessage">
+                  {{ availabilitySuccessMessage }}
+                </p>
+                <p class="error-message" ng-if="availabilityErrorMessage">
+                  {{ availabilityErrorMessage }}
+                </p>
+              </form>
+              <ul
+                ng-if="selectedAvailability && selectedAvailability.length > 0"
+              >
+                <li ng-repeat="slot in selectedAvailability">
+                  {{ slot.day }}: {{ slot.timeSlot }}
+                  <button
+                    ng-click="deleteAvailability(selectedTherapistInfo.id, slot.day, slot.timeSlot)"
+                  >
+                    Delete
+                  </button>
+                </li>
+              </ul>
+              <p
+                ng-if="!selectedAvailability || selectedAvailability.length === 0"
+              >
+                No availability set.
+              </p>
+            </div>
+
+            <div class="reviews">
+              <h3>Reviews</h3>
+              <ul ng-if="selectedReviews && selectedReviews.length > 0">
+                <li ng-repeat="review in selectedReviews">
+                  <div class="review-header">
+                    <span>User: {{ review.userId }}</span>
+                    <span class="rating">Rating: {{ review.rating }}/5</span>
+                    <span class="date"
+                      >{{ review.date | date:'MMM d, yyyy' }}</span
+                    >
+                  </div>
+                  <p class="comment">{{ review.comment }}</p>
+                </li>
+              </ul>
+              <p ng-if="!selectedReviews || selectedReviews.length === 0">
+                No reviews yet.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      angular
+        .module("therapistApp", [])
+        .controller("TherapistController", function ($scope, $http) {
+          $scope.therapists = [];
+          $scope.searchQuery = "";
+          $scope.selectedTherapistInfo = null;
+          $scope.selectedAvailability = [];
+          $scope.selectedReviews = [];
+          $scope.newTherapist = {};
+          $scope.addSuccessMessage = "";
+          $scope.addErrorMessage = "";
+          $scope.updateSuccessMessage = "";
+          $scope.updateErrorMessage = "";
+          $scope.deleteSuccessMessage = "";
+          $scope.deleteErrorMessage = "";
+          $scope.newAvailability = {};
+          $scope.availabilitySuccessMessage = "";
+          $scope.availabilityErrorMessage = "";
+          $scope.showAddTherapist = false;
+          $scope.showTherapistInfoModal = false;
+          $scope.showEditTherapistModal = false;
+
+          $scope.getTherapists = function () {
+            $http
+              .get("http://localhost:5000/api/therapists")
+              .then(function (response) {
+                $scope.therapists = response.data;
+                // Reset messages on data refresh
+                $scope.addSuccessMessage = "";
+                $scope.addErrorMessage = "";
+                $scope.updateSuccessMessage = "";
+                $scope.updateErrorMessage = "";
+                $scope.deleteSuccessMessage = "";
+                $scope.deleteErrorMessage = "";
+                $scope.availabilitySuccessMessage = "";
+                $scope.availabilityErrorMessage = "";
+              })
+              .catch(function (error) {
+                console.error("Error fetching therapists:", error);
+              });
+          };
+
+          $scope.openTherapistInfoModal = function (therapistId) {
+            $http
+              .get(`http://localhost:5000/api/therapists/${therapistId}`)
+              .then(function (response) {
+                $scope.selectedTherapistInfo = response.data;
+                $scope.selectedAvailability = [];
+                $scope.selectedReviews = [];
+                document.getElementById("therapistInfoModal").style.display =
+                  "block";
+              })
+              .catch(function (error) {
+                console.error("Error fetching therapist details:", error);
+              });
+          };
+
+          $scope.closeTherapistInfoModal = function () {
+            document.getElementById("therapistInfoModal").style.display =
+              "none";
+            $scope.selectedTherapistInfo = null;
+            $scope.selectedAvailability = [];
+            $scope.selectedReviews = [];
+          };
+
+          $scope.loadAvailability = function (therapistId) {
+            $http
+              .get(
+                `http://localhost:5000/api/therapists/${therapistId}/availability`
+              )
+              .then(function (availabilityResponse) {
+                $scope.selectedAvailability = availabilityResponse.data;
+              })
+              .catch(function (error) {
+                console.error("Error fetching availability:", error);
+                $scope.selectedAvailability = [];
+              });
+          };
+
+          $scope.loadReviews = function (therapistId) {
+            $http
+              .get(
+                `http://localhost:5000/api/therapists/${therapistId}/reviews`
+              )
+              .then(function (reviewsResponse) {
+                reviewsResponse.data.forEach(function (review) {
+                  review.date = new Date(review.date);
+                });
+                $scope.selectedReviews = reviewsResponse.data;
+              })
+              .catch(function (error) {
+                console.error("Error fetching reviews:", error);
+                $scope.selectedReviews = [];
+              });
+          };
+
+          $scope.openAddTherapistModal = function () {
+            document.getElementById("addTherapistModal").style.display =
+              "block";
+          };
+
+          $scope.closeAddTherapistModal = function () {
+            document.getElementById("addTherapistModal").style.display = "none";
+            $scope.newTherapist = {}; // Clear the form
+            $scope.addSuccessMessage = "";
+            $scope.addErrorMessage = "";
+          };
+
+          $scope.addTherapist = function () {
+            $http
+              .post("http://localhost:5000/api/therapists", $scope.newTherapist)
+              .then(function (response) {
+                $scope.getTherapists();
+                $scope.closeAddTherapistModal();
+                $scope.addSuccessMessage = response.data.message;
+                $scope.addErrorMessage = "";
+              })
+              .catch(function (error) {
+                console.error("Error adding therapist:", error);
+                $scope.addErrorMessage = error.data
+                  ? error.data.error
+                  : "Failed to add therapist.";
+                $scope.addSuccessMessage = "";
+              });
+          };
+
+          $scope.openEditTherapist = function (therapist) {
+            $scope.selectedTherapistInfo = angular.copy(therapist); // Create a copy to avoid direct modification
+            document.getElementById("editTherapistModal").style.display =
+              "block";
+          };
+
+          $scope.closeEditTherapistModal = function () {
+            document.getElementById("editTherapistModal").style.display =
+              "none";
+            $scope.updateSuccessMessage = "";
+            $scope.updateErrorMessage = "";
+          };
+
+          $scope.updateTherapist = function (id) {
+            $http
+              .put(
+                `http://localhost:5000/api/therapists/${id}`,
+                $scope.selectedTherapistInfo
+              )
+              .then(function (response) {
+                $scope.getTherapists();
+                $scope.closeEditTherapistModal();
+                $scope.updateSuccessMessage = response.data.message;
+                $scope.updateErrorMessage = "";
+              })
+              .catch(function (error) {
+                console.error("Error updating therapist:", error);
+                $scope.updateErrorMessage = error.data
+                  ? error.data.error
+                  : "Failed to update therapist.";
+                $scope.updateSuccessMessage = "";
+              });
+          };
+
+          $scope.deleteTherapist = function (id) {
+            if (confirm("Are you sure you want to delete this therapist?")) {
+              $http
+                .delete(`http://localhost:5000/api/therapists/${id}`)
+                .then(function (response) {
+                  $scope.getTherapists();
+                  $scope.closeTherapistInfoModal(); // Close the info modal if open
+                  $scope.deleteSuccessMessage = response.data.message;
+                  $scope.deleteErrorMessage = "";
+                })
+                .catch(function (error) {
+                  console.error("Error deleting therapist:", error);
+                  $scope.deleteErrorMessage = error.data
+                    ? error.data.error
+                    : "Failed to delete therapist.";
+                  $scope.deleteSuccessMessage = "";
+                });
+            }
+          };
+
+          $scope.addAvailability = function (therapistId) {
+            $http
+              .post(
+                `http://localhost:5000/api/therapists/${therapistId}/availability`,
+                $scope.newAvailability
+              )
+              .then(function (response) {
+                $scope.loadAvailability(therapistId); // Refresh availability in the modal
+                $scope.newAvailability = {};
+                $scope.availabilitySuccessMessage = response.data.message;
+                $scope.availabilityErrorMessage = "";
+              })
+              .catch(function (error) {
+                console.error("Error adding availability:", error);
+                $scope.availabilityErrorMessage = error.data
+                  ? error.data.error
+                  : "Failed to add availability.";
+                $scope.availabilitySuccessMessage = "";
+              });
+          };
+
+          $scope.deleteAvailability = function (therapistId, day, timeSlot) {
+            $http
+              .delete(
+                `http://localhost:5000/api/therapists/${therapistId}/availability`,
+                { data: { day: day, timeSlot: timeSlot } }
+              )
+              .then(function (response) {
+                $scope.loadAvailability(therapistId); // Refresh availability in the modal
+                $scope.availabilitySuccessMessage = response.data.message;
+                $scope.availabilityErrorMessage = "";
+              })
+              .catch(function (error) {
+                console.error("Error deleting availability:", error);
+                $scope.availabilityErrorMessage = error.data
+                  ? error.data.error
+                  : "Failed to delete availability.";
+                $scope.availabilitySuccessMessage = "";
+              });
+          };
+
+          // Initial load
+          $scope.getTherapists();
+        });
+    </script>
+  </body>
+</html>

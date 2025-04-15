@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="registerApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #0f0f0f;
+            color: #e0e0e0;
+        }
+        .container {
+            display: flex;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(4, 61, 75, 0.1);
+            background: rgba(255, 255, 255, 0.5); /* White with 50% transparency */
+            width: 600px;
+        }
+        .left {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right {
+            width: 50%;
+            padding: 20px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .register-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .social-login {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        width: 80%;
+        margin: 5px 0;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+        .google { background-color: #41201d; color: white; }
+        .apple { background-color: #eeeeee; color: rgb(0, 0, 0); }
+    </style>
+</head>
+<body ng-controller="RegisterController">
+    <div class="container">
+        <div class="left">
+            <img src="SHOGOAsset 3LOGO.png" alt="Mascot" width="300" height="400">
+        </div>
+        <div class="right">
+            <h2>Create Account</h2>
+            <input type="text" class="input-field" placeholder="Full Name" ng-model="user.fullName">
+            <input type="text" class="input-field" placeholder="Username" ng-model="user.username">
+            <input type="text" class="input-field" placeholder="Email/Phone Number" ng-model="user.email">
+            <input type="password" class="input-field" placeholder="Password" ng-model="user.password">
+            <input type="password" class="input-field" placeholder="Confirm Password" ng-model="user.confirmPassword">
+            <button class="register-btn" ng-click="register()">Create Account</button>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <img
+                      src="google.png"
+                      alt="Mascot"
+                      width="20"
+                    />Google
+                  </button>
+                  <button class="social-btn apple">
+                    <img
+                      src=".png"
+                      alt="Mascot"
+                      width="20"
+                    />
+                    Apple ID
+                  </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = angular.module('registerApp', []);
+    
+        app.controller('RegisterController', function($scope, $http) {
+            $scope.user = {};
+    
+            $scope.register = function() {
+                if ($scope.user.password !== $scope.user.confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+            
+                if (!$scope.user.fullName || !$scope.user.username || !$scope.user.email || !$scope.user.password) {
+                    alert('Please fill in all fields!');
+                    return;
+                }
+            
+                $http.post('http://localhost:5000/register', $scope.user)
+                    .then(function(response) {
+                        alert(response.data.message);
+                        window.location.href = "login.html"; // Redirect to login page after success
+                    })
+                    .catch(function(error) {
+                        alert(error.data.error || "Registration failed.");
+                    });
+            };
+        });
+    </script>
+    
+</body>
+</html>

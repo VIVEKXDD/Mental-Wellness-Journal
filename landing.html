@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wellness Hub - Your Mental Wellness Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 150px 20px;
+            background: linear-gradient(135deg, #181818, #252525), url('j.jpeg'); /* Add background image to hero */
+            background-size: cover;
+            background-blend-mode: multiply; /* Blend the background gradient with the image */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.2), transparent);
+            filter: blur(50px);
+            z-index: 0;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(229, 115, 115, 0.2), transparent);
+            filter: blur(50px);
+            z-index: 0;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #d0d0d0;
+        }
+
+        .hero button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero button:hover {
+            background-color: #3578c4;
+            transform: translateY(-2px);
+        }
+
+        .features {
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 3em;
+            margin-bottom: 60px;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            padding: 30px;
+            background-color: #181818;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature img {
+            width: 70px;
+            margin-bottom: 25px;
+        }
+
+        .feature h3 {
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        .about {
+            padding: 100px 20px;
+            background: url('NIGGAS.jpg'), #252525; /* Add background image to about */
+            background-size: cover;
+            background-blend-mode: multiply;
+        }
+
+        .about h2 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .about p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1em;
+            color: #d0d0d0;
+        }
+
+        .cta {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .cta h2 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .cta button {
+            background-color: #e57373;
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta button:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #181818;
+            color: #aaa;
+        }
+
+        .testimonial-section {
+            position: relative;
+            padding: 80px 20px;
+            background: #181818;
+            text-align: center;
+        }
+
+        .testimonial-container {
+            display: flex;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            gap: 30px;
+            padding: 30px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .testimonial-card {
+            flex: 0 0 auto;
+            width: 350px;
+            padding: 30px;
+            background: linear-gradient(145deg, #202020, #2a2a2a);
+            border-radius: 18px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: scale(1.03);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background-color: #333;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+
+        .user-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+
+        .user-since {
+            font-size: 1em;
+            color: #bbb;
+        }
+
+        .testimonial-text {
+            font-size: 1.1em;
+            text-align: left;
+            color: #d0d0d0;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .prev-btn {
+            left: 20px;
+        }
+
+        .next-btn {
+            right: 20px;
+        }
+
+        .feature-description {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2a2a2a;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            max-width: 500px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <h1>Your Journey to Mental Wellness Starts Here</h1>
+        <p>
+            Discover a holistic approach to mental health with Wellness Hub. Track
+            your mood, journal your thoughts, and connect with AI-powered support.
+        </p>
+        <button><a href="login.html">Get Started</a></button>
+    </section>
+    <section class="features">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature" onclick="showDescription('journal')">
+                <img src="journal.png" alt="Journal Icon" />
+                <h3>Journaling</h3>
+                <p>Reflect on your day and track your moods.</p>
+            </div>
+            <div class="feature" onclick="showDescription('mentalHealth')">
+                <img src="MentalHealth.png" alt="Mental Health Icon" />
+                <h3>Mental Health</h3>
+                <p>Insights and tools to manage your mental well-being.</p>
+            </div>
+            <div class="feature" onclick="showDescription('aiSupport')">
+                <img src="TALAI.png" alt="TAL AI Icon" />
+                <h3>TAL AI</h3>
+                <p>AI-powered support and conversation.</p>
+            </div>
+            <div class="feature" onclick="showDescription('zenMode')">
+                <img src="ZENMODES.png" alt="Zen Mode Icon" />
+                <h3>Zen Mode</h3>
+                <p>Relaxation and meditation exercises.</p>
+            </div>
+        </div>
+    </section>
+    <section class="about" >
+        <h2>About Wellness Hub</h2>
+        <p>
+            Wellness Hub is designed to be your personal companion on your journey to mental wellness. We believe that everyone deserves access to tools and resources that support their mental health. Our app provides a safe and supportive space for you to explore your thoughts, feelings, and emotions.
+        </p><BR>
+        <p>
+            Our mission is to empower you with the tools and insights needed to navigate the complexities of daily life and foster a deeper understanding of your inner self. We offer a range of features, including journaling prompts, mindfulness exercises, and mood tracking, all tailored to help you build resilience and cultivate positive mental habits.
+        </p><BR>
+        <p>
+            At Wellness Hub, we prioritize privacy and confidentiality. Your personal reflections and data are secured, ensuring a trusted environment for self-discovery. We are committed to continuous improvement, regularly updating our app with new content and features based on the latest research in mental health and user feedback.
+        </p><BR>
+        <p>
+            Whether you're looking to manage stress, improve your mood, or simply gain a better understanding of yourself, Wellness Hub is here to support you every step of the way. Join our community and embark on a path towards a healthier, more balanced life.
+        </p>
+    </section>
+    <section class="cta">
+        <h2>Ready to Start Your Wellness Journey?</h2>
+        <button>Download Now</button>
+    </section>
+    <section class="testimonial-section">
+        <button class="nav-btn prev-btn" onclick="scrollTestimonials(-1)">❮</button>
+        <div class="testimonial-container">
+            <div class="testimonial-card">
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <div>
+                        <h3 class="user-name">KANYE WEST</h3>
+                        <p class="user-since">User since 2022</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "This site is like a god to me, it allowed me to reconnect to the
+                    world back again in simpler ways."
+                </p>
+            </div>
+            <div class="testimonial-card">
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <div>
+                        <h3 class="user-name">JANE DOE</h3>
+                        <p class="user-since">Member since 2021</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "I love this platform! It's made my life so much easier."
+                </p>
+            </div>
+            <div class="testimonial-card">
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <div>
+                        <h3 class="user-name">ALICE SMITH</h3>
+                        <p class="user-since">User since 2023</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "The Zen Mode has helped me relax and de-stress. Highly recommend!"
+                </p>
+            </div>
+        </div>
+        <button class="nav-btn next-btn" onclick="scrollTestimonials(1)">❯</button>
+    </section>
+    <footer>
+        <p>&copy; 2025 Wellness Hub. All rights reserved.</p>
+    </footer>
+    <div id="featureDescription" class="feature-description">
+        <p id="descriptionText"></p>
+        <button onclick="hideDescription()">Close</button>
+    </div>
+    <div id="overlay" class="overlay"></div>
+    <script>
+        const container = document.querySelector(".testimonial-container");
+        let autoScrollInterval;
+
+        function scrollTestimonials(direction) {
+            const scrollAmount = 370;
+            container.scrollBy({ left: scrollAmount * direction, behavior: "smooth" });
+        }
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+                    container.scrollTo({ left: 0, behavior: "smooth" });
+                } else {
+                    container.scrollBy({ left: 370, behavior: "smooth" });
+                }
+            }, 3000);
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+
+        container.addEventListener("mouseenter", stopAutoScroll);
+        container.addEventListener("mouseleave", startAutoScroll);
+
+        startAutoScroll();
+
+        function showDescription(feature) {
+            const descriptionDiv = document.getElementById("featureDescription");
+            const overlay = document.getElementById("overlay");
+            const descriptionText = document.getElementById("descriptionText");
+
+            switch (feature) {
+                case 'journal':
+                    descriptionText.textContent = "Journaling allows you to record your daily thoughts and feelings, helping you identify patterns and manage stress. Use our customizable journal templates to keep track of your mood, reflect on your day, and develop a deeper understanding of your emotional landscape. This feature supports self-awareness and emotional regulation.";
+                    break;
+                case 'mentalHealth':
+                    descriptionText.textContent = "Access a curated collection of resources, articles, and tools tailored to improve your mental health and well-being. From guided meditations and stress-relief techniques to educational content on mental health conditions, this section provides comprehensive support for your mental wellness journey. We also include a mood tracker and progress visualizations to help you monitor your mental state over time.";
+                    break;
+                case 'aiSupport':
+                    descriptionText.textContent = "TAL AI is an AI-powered conversational partner that provides support and guidance whenever you need it. Engage in meaningful conversations, receive personalized advice, and practice mindfulness techniques with our AI companion. TAL AI is designed to simulate empathetic responses and provide a safe space for you to express your feelings and concerns.";
+                    break;
+                case 'zenMode':
+                    descriptionText.textContent = "Zen Mode offers guided meditation and relaxation exercises to help you find peace and reduce anxiety. Immerse yourself in calming soundscapes, breathing exercises, and guided visualizations designed to promote relaxation and mental clarity. This feature includes customizable sessions to fit your schedule and preferences, fostering a sense of calm and tranquility in your daily life.";
+                    break;
+            }
+            descriptionDiv.style.display = 'block';
+            overlay.style.display = 'block';
+            setTimeout(() => {
+                descriptionDiv.style.opacity = '1';
+                overlay.style.opacity = '1';
+            }, 10);
+        }
+
+        function hideDescription() {
+            const descriptionDiv = document.getElementById("featureDescription");
+            const overlay = document.getElementById("overlay");
+            descriptionDiv.style.opacity = '0';
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                descriptionDiv.style.display = 'none';
+                overlay.style.display = 'none';
+            }, 500);
+        }
+    </script>
+</body>
+</html>

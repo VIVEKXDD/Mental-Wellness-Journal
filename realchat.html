@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="talAiApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TAL AI</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #0f0f0f;
+        color: #e0e0e0;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 250px;
+        background: #181818;
+        padding: 30px 20px;
+        box-sizing: border-box;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+      .logo img {
+        width: 60px;
+        margin-right: 15px;
+        border-radius: 50%;
+      }
+      .nav a {
+        display: block;
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #ffffff;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: background-color 0.3s;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background-color: #333333;
+      }
+      .content {
+        flex: 1;
+        padding: 30px;
+        box-sizing: border-box;
+        display: flex;
+      }
+      .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .tal-ai-section {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .chat-container {
+        display: flex;
+        margin-bottom: 20px;
+        flex-grow: 1;
+      }
+      .chat-messages {
+        flex: 1;
+        text-align: left;
+        overflow-y: auto;
+        background-color: #252525;
+        padding: 10px;
+        border-radius: 8px;
+        margin-right: 20px; /* Space between messages and past chats */
+        display: flex;
+        flex-direction: column;
+      }
+      .past-chats {
+        width: 300px; /* Adjust width as needed */
+        text-align: left;
+        background-color: #333333;
+        padding: 10px;
+        border-radius: 8px;
+        overflow-y: auto;
+      }
+      .past-chats h3 {
+        margin-top: 0;
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+      .chat-session {
+        margin-bottom: 8px;
+        cursor: pointer;
+        color: #ffffff;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+      .chat-session:hover {
+        background-color: #444444;
+      }
+      .chat-session.active {
+        background-color: #4a90e2;
+      }
+      .input-area {
+        display: flex;
+        margin-top: 10px;
+      }
+      .input-area input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        background-color: #252525;
+        color: #ffffff;
+      }
+      .input-area button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 0 8px 8px 0;
+        background-color: #4a90e2;
+        color: white;
+        cursor: pointer;
+      }
+      .message {
+        margin-bottom: 8px;
+        color: #ffffff;
+        word-break: break-word;
+      }
+      .sender {
+        font-weight: bold;
+        margin-right: 5px;
+        color: #ffffff;
+      }
+      .gradient-text {
+        background: linear-gradient(to right, #4a90e2, #e57373);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 2em;
+      }
+      .error-message {
+        color: #e57373;
+        margin-top: 5px;
+        font-size: 0.9em;
+      }
+      .loading-indicator {
+        color: #4a90e2;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body ng-controller="TalAiController">
+    <div class="container">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="mentalgeltAsset1logo.png" alt="App Logo" />
+          <span class="gradient-text">Wellness Hub</span>
+        </div>
+        <div class="nav">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="journalling.html">Journaling</a>
+          <a href="therapist.html">Therapist</a>
+          <a href="meditation.html">Zen Mode</a>
+          <a href="ai.html" class="active">TAL AI</a>
+          <a href="panic.html">Panic Button</a>
+          <a href="landing.html">Logout</a>
+        </div>
+      </aside>
+
+      <div class="content">
+        <main class="chat-area">
+          <section class="tal-ai-section">
+            <h2>TAL AI</h2>
+            <div class="chat-container">
+              <div class="chat-messages">
+                <div
+                  class="message"
+                  ng-repeat="message in chatMessages track by $index"
+                >
+                  <span class="sender">{{ message.sender }}:</span>
+                  <span class="text">{{ message.text }}</span>
+                </div>
+                <div ng-show="isChatLoading" class="loading-indicator">
+                  Loading messages...
+                </div>
+              </div>
+              <div class="past-chats">
+                <h3>Past Chats</h3>
+                <div
+                  class="chat-session"
+                  ng-repeat="session in chatSessions track by session.sessionId"
+                  ng-click="loadSessionMessages(session.sessionId)"
+                  title="{{ session.startTime | date:'medium' }}"
+                  ng-class="{ 'active': currentSessionId === session.sessionId }"
+                >
+                  {{ session.summary || ('Chat from ' + (session.startTime |
+                  date:'short')) }}
+                </div>
+                <div ng-show="isSessionsLoading" class="loading-indicator">
+                  Loading past chats...
+                </div>
+                <div ng-show="sessionsError" class="error-message">
+                  {{ sessionsError }}
+                </div>
+              </div>
+            </div>
+
+            <div class="input-area">
+              <input
+                type="text"
+                placeholder="Ask TAL AI"
+                ng-model="userQuestion"
+                ng-keydown="$event.keyCode === 13 && askAi()"
+                ng-disabled="isLoading"
+              />
+              <button ng-click="askAi()" ng-disabled="isLoading">
+                {{ isLoading ? 'Thinking...' : 'Send' }}
+              </button>
+            </div>
+            <div ng-show="aiError" class="error-message">{{ aiError }}</div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      angular
+        .module("talAiApp", [])
+        .controller("TalAiController", function ($scope, $http, $timeout) {
+          $scope.chatMessages = [];
+          $scope.chatSessions = [];
+          $scope.currentSessionId = null;
+          $scope.userQuestion = "";
+          $scope.isLoading = false;
+          $scope.isChatLoading = false;
+          $scope.isSessionsLoading = false;
+          $scope.aiError = null;
+          $scope.sessionsError = null;
+
+          const userId = localStorage.getItem("userId");
+          if (!userId) {
+            alert("User ID not found. Please log in again.");
+            window.location.href = "login.html";
+            return;
+          }
+
+          function scrollToBottom() {
+            $timeout(
+              () => {
+                const chatMessagesDiv =
+                  document.querySelector(".chat-messages");
+                if (chatMessagesDiv) {
+                  chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                }
+              },
+              0,
+              false
+            );
+          }
+
+          function loadChatSessions() {
+            $scope.isSessionsLoading = true;
+            $scope.sessionsError = null;
+
+            $http
+              .get(`http://localhost:5000/api/chat/${userId}`)
+              .then((res) => {
+                $scope.chatSessions = Array.isArray(res.data) ? res.data : [];
+              })
+              .catch((err) => {
+                console.error("Error loading sessions:", err);
+                $scope.sessionsError = "Failed to load past chats.";
+              })
+              .finally(() => {
+                $scope.isSessionsLoading = false;
+              });
+          }
+
+          $scope.loadSessionMessages = function (sessionId) {
+            if (!sessionId) return;
+
+            $scope.currentSessionId = sessionId;
+            $scope.chatMessages = [];
+            $scope.isChatLoading = true;
+            $scope.aiError = null;
+
+            $http
+              .get(`http://localhost:5000/api/chat/${userId}/${sessionId}`)
+              .then((res) => {
+                $scope.chatMessages = Array.isArray(res.data) ? res.data : [];
+                scrollToBottom();
+              })
+              .catch((err) => {
+                console.error("Error loading messages:", err);
+                $scope.aiError = "Failed to load chat messages.";
+              })
+              .finally(() => {
+                $scope.isChatLoading = false;
+              });
+          };
+
+          $scope.askAi = function () {
+            const trimmed = $scope.userQuestion.trim();
+            if (!trimmed) return;
+
+            $scope.chatMessages.push({ sender: "You", text: trimmed });
+            scrollToBottom();
+            $scope.userQuestion = "";
+            $scope.isLoading = true;
+            $scope.aiError = null;
+
+            $http
+              .post("http://localhost:5000/api/chat", {
+                userId,
+                userMessage: trimmed,
+                sessionId: $scope.currentSessionId,
+              })
+              .then((res) => {
+                const reply =
+                  res.data?.aiResponse ||
+                  "I'm sorry, I didn't understand that.";
+                $scope.chatMessages.push({ sender: "TAL AI", text: reply });
+                if (!$scope.currentSessionId && res.data?.sessionId) {
+                  $scope.currentSessionId = res.data.sessionId;
+                  loadChatSessions();
+                }
+                scrollToBottom();
+              })
+              .catch((err) => {
+                console.error("AI error:", err);
+                $scope.aiError = "AI service unavailable. Try again later.";
+              })
+              .finally(() => {
+                $scope.isLoading = false;
+              });
+          };
+
+          // Initial load
+          $timeout(loadChatSessions, 100, false);
+        });
+    </script>
+  </body>
+</html>

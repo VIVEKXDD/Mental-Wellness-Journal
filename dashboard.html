@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mentalHealthApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mental Wellness</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .search {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        width: 300px;
+        font-size: 1em;
+        background: #252525;
+        color: #ffffff;
+      }
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #0f0f0f;
+        color: #e0e0e0;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 250px;
+        background: #181818;
+        padding: 30px 20px;
+        box-sizing: border-box;
+        color: #ffffff;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+      .logo img {
+        width: 60px;
+        margin-right: 15px;
+        border-radius: 50%;
+      }
+      .nav a {
+        display: block;
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #ffffff;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: background-color 0.3s;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background-color: #333333;
+      }
+      .content {
+        flex: 1;
+        padding: 30px;
+        box-sizing: border-box;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .quote-box {
+        text-align: center;
+        padding: 15px;
+        background-color: #1e1e1e;
+        border-radius: 12px;
+        font-size: 1.2em;
+        font-style: italic;
+        color: #b0b0b0;
+        box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+      }
+      .mental-health-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .widget {
+        background-color: #252525;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+        transition: transform 0.2s ease-in-out;
+      }
+      .widget:hover {
+        transform: scale(1.05);
+      }
+      .widget h3 {
+        margin-bottom: 15px;
+        color: #ffffff;
+      }
+      .widget button {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .widget button:hover {
+        background-color: #3578c4;
+      }
+      .gradient-text {
+        background: linear-gradient(to right, #4a90e2, #e57373);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 2em;
+      }
+    </style>
+  </head>
+  <body ng-controller="MentalHealthController">
+    <div class="container">
+      <aside class="sidebar">
+        <div class="logo">
+          <img ng-src="SHOGOAsset 3LOGO.png" alt="App Logo" />
+          <span class="gradient-text">Wellness Hub</span>
+        </div>
+        <div class="nav">
+          <a href="dashboard.html" class="active">Dashboard</a>
+          <a href="journalling.html">Journaling</a>
+          <a href="therapist.html">Therapist</a>
+          <a href="meditation.html">Zen Mode</a>
+          <a href="ai.html">TAL AI</a>
+          <a href="panic.html">Panic Button</a>
+          <a href="landing.html">Logout</a>
+        </div>
+      </aside>
+      <main class="content">
+        <header class="header">
+          <input
+            type="text"
+            placeholder="Search"
+            class="search"
+            ng-model="searchQuery"
+          />
+          <div class="user-profile">
+            <span class="gradient-text">{{ username }}</span>
+            <img ng-src="{{ userAvatarUrl }}" alt="User Avatar" />
+          </div>
+        </header>
+        <div class="quote-box gradient-text">{{ motivationalQuote }}</div>
+        <section class="mental-health-section">
+          <div class="widget">
+            <h3>Insights</h3>
+            <img
+              ng-src="http://localhost:3000/api/users/{{userId}}/insight-visual"
+              alt="Insights Graph"
+              style="width: 100%; height: auto"
+            />
+          </div>
+          <div class="widget journal">
+            <h3>Journal</h3>
+            <p>Productive Hours 💪</p>
+            <span>{{ productiveHourStart }} - {{ productiveHourEnd }}</span>
+          </div>
+          <div class="widget heatmap">
+            <h3>Emotional Heatmap</h3>
+            <img
+              ng-src="http://localhost:3000/api/users/{{userId}}/heatmap-image"
+              alt="Heatmap"
+              style="width: 100%; height: auto"
+            />
+          </div>
+          <div class="widget mental-journey">
+            <h3>MENTAL JOURNEY</h3>
+            <p>Prompt: {{ mentalJourneyPrompt }}</p>
+            <button ng-click="fetchRandomPrompt()">Next Prompt</button>
+          </div>
+          <div class="widget mood-tracking">
+            <h3>Mood Tracking (Last 7 Days)</h3>
+            <canvas id="moodChart" width="400" height="200"></canvas>
+            <button ng-click="fetchMoodGraphData()">Load Mood Data</button>
+          </div>
+
+          <div class="widget score-trends">
+            <h3>Score Trends (Last 7 Entries)</h3>
+            <canvas id="scoreChart" width="400" height="200"></canvas>
+            <button ng-click="fetchScoreTrends()">Load Score Trends</button>
+          </div>
+
+          <div class="widget mood-swing">
+            <h3>Mood Swing</h3>
+            <p>Possible Links 🎢</p>
+            <div>
+              <span>{{ moodSwingFactor1 }}</span>
+              <span>...</span>
+              <span>{{ moodSwingFactor2 }}</span>
+            </div>
+          </div>
+          <div class="widget mental-scores">
+            <h3>Mental Scores <span>🙂</span></h3>
+            <span>{{ mentalScore }}%</span>
+            <button ng-click="fetchMentalScore()">Refresh Score</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+      angular
+        .module("mentalHealthApp", [])
+        .controller(
+          "MentalHealthController",
+          function ($scope, $interval, $http) {
+            const userId = 1; // Ensure this matches a user in your database
+
+            // Refs for Chart instances
+            let moodChartInstance = null;
+            let scoreChartInstance = null;
+
+            $http
+              .get(`http://localhost:3000/api/users/${userId}`)
+              .then(function (response) {
+                $scope.username = response.data.username;
+                $scope.userAvatarUrl =
+                  response.data.avatarUrl ||
+                  "http://localhost:3000/api/dynamic-image/avatar";
+              })
+              .catch(function () {
+                $scope.username = "Guest";
+                $scope.userAvatarUrl =
+                  "http://localhost:3000/api/dynamic-image/avatar";
+              });
+
+            $scope.logoUrl = "http://localhost:3000/api/dynamic-image/logo";
+
+            const quotes = [
+              "You are stronger than you think.",
+              "Your emotions are valid, take time to process them.",
+              "Every day may not be good, but there is something good in every day.",
+              "Self-care is not selfish, it’s necessary.",
+              "Healing is not linear, and that’s okay.",
+            ];
+
+            function updateQuote() {
+              $scope.motivationalQuote =
+                quotes[Math.floor(Math.random() * quotes.length)];
+            }
+
+            updateQuote();
+            $interval(updateQuote, 5000);
+
+            $http
+              .get(
+                `http://localhost:3000/api/users/${userId}/random-productive-hours`
+              )
+              .then((res) => {
+                $scope.productiveHourStart = res.data.start;
+                $scope.productiveHourEnd = res.data.end;
+              });
+
+            $scope.fetchRandomPrompt = function () {
+              $http
+                .get("http://localhost:3000/api/random-prompt")
+                .then((res) => ($scope.mentalJourneyPrompt = res.data.prompt));
+            };
+            $scope.fetchRandomPrompt();
+
+            $http
+              .get(
+                `http://localhost:3000/api/users/${userId}/random-mood-swing-factors`
+              )
+              .then((res) => {
+                $scope.moodSwingFactor1 = res.data.factor1;
+                $scope.moodSwingFactor2 = res.data.factor2;
+              });
+
+            $scope.fetchMentalScore = function () {
+              $http
+                .get(
+                  `http://localhost:3000/api/users/${userId}/latest-mental-score`
+                )
+                .then((res) => ($scope.mentalScore = res.data.overall_score));
+            };
+            $scope.fetchMentalScore();
+
+            $scope.fetchMoodGraphData = function () {
+              $http
+                .get(
+                  `http://localhost:3000/api/users/${userId}/mood-graph-data`
+                )
+                .then((res) => {
+                  const moodData = res.data;
+                  const labels = moodData.map((d) => d.date);
+                  const scores = moodData.map((d) => d.average_mood); // Use average_mood
+
+                  if (moodChartInstance) moodChartInstance.destroy();
+
+                  const ctx = document
+                    .getElementById("moodChart")
+                    .getContext("2d");
+                  moodChartInstance = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                      labels: labels,
+                      datasets: [
+                        {
+                          label: "Average Mood",
+                          data: scores,
+                          borderColor: "#4a90e2",
+                          backgroundColor: "rgba(74, 144, 226, 0.2)",
+                          fill: true,
+                          tension: 0.3,
+                        },
+                      ],
+                    },
+                    options: {
+                      responsive: true,
+                      scales: {
+                        y: { beginAtZero: true, max: 5 }, // Adjust max based on your mood scale
+                      },
+                    },
+                  });
+                });
+            };
+            $scope.fetchMoodGraphData();
+
+            $scope.fetchScoreTrends = function () {
+              $http
+                .get(`http://localhost:3000/api/users/${userId}/score-trends`)
+                .then((res) => {
+                  const trendData = res.data;
+                  const labels = trendData.map((d) => d.score_date); // Use score_date
+                  const scores = trendData.map((d) => d.overall_score);
+
+                  if (scoreChartInstance) scoreChartInstance.destroy();
+
+                  const ctx = document
+                    .getElementById("scoreChart")
+                    .getContext("2d");
+                  scoreChartInstance = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                      labels: labels,
+                      datasets: [
+                        {
+                          label: "Overall Score",
+                          data: scores,
+                          backgroundColor: "#e57373",
+                        },
+                      ],
+                    },
+                    options: {
+                      responsive: true,
+                      scales: {
+                        y: { beginAtZero: true, max: 100 },
+                      },
+                    },
+                  });
+                });
+            };
+            $scope.fetchScoreTrends();
+          }
+        );
+    </script>
+  </body>
+</html>
