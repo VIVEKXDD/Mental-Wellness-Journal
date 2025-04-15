@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="notesApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+      body {
+          margin: 0;
+          font-family: "Poppins", sans-serif;
+          background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+          color: #e0e0e0;
+          transition: background 0.5s ease; /* Smooth background transition */
+      }
+  
+      .container {
+          display: flex;
+          height: 100vh;
+      }
+  
+      .sidebar {
+          width: 280px;
+          background: #181818;
+          padding: 30px 25px;
+          box-sizing: border-box;
+          position: relative;
+          z-index: 10;
+          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+          transition: transform 0.3s ease, box-shadow 0.3s ease; /* Sidebar transition effects */
+      }
+  
+      .sidebar:hover {
+          transform: translateX(5px);
+          box-shadow: 4px 0 15px rgba(0, 0, 0, 0.7);
+      }
+  
+      .logo {
+          display: flex;
+          align-items: center;
+          margin-bottom: 40px;
+          transition: transform 0.3s ease; /* Logo transition */
+      }
+      .logo:hover {
+          transform: scale(1.05);
+      }
+  
+      .logo img {
+          width: 60px;
+          margin-right: 15px;
+          border-radius: 50%;
+          box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+          transition: box-shadow 0.3s ease;
+      }
+      .logo img:hover {
+          box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
+      }
+  
+      .note-list {
+          list-style: none;
+          padding: 0;
+      }
+  
+      .note-list li {
+          padding: 15px 20px;
+          border-bottom: 1px solid #333;
+          cursor: pointer;
+          color: #ffffff;
+          transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+          border-radius: 5px;
+          margin-bottom: 5px;
+      }
+  
+      .note-list li.active,
+      .note-list li:hover {
+          background-color: #333333;
+          transform: scale(1.02);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+  
+      .content {
+          flex: 1;
+          padding: 30px;
+          box-sizing: border-box;
+          background-color: #252525;
+          position: relative;
+          transition: background-color 0.3s ease;
+      }
+  
+      .content:hover {
+          background-color: #282828;
+      }
+  
+      .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+      }
+  
+      .search {
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          width: 300px;
+          font-size: 1em;
+          background: #333;
+          color: #ffffff;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .search:focus {
+          outline: none;
+          box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+      }
+  
+      .note-content {
+          border-radius: 10px;
+          padding: 25px;
+          background: #333;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+          transition: box-shadow 0.3s ease;
+      }
+      .note-content:hover{
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+  
+      .note-content h2 {
+          margin-top: 0;
+          color: #ffffff;
+          font-size: 1.8em;
+          margin-bottom: 20px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          transition: color 0.3s ease;
+      }
+      .note-content h2:hover{
+          color: #b0b0b0;
+      }
+  
+      .note-content textarea {
+          width: 100%;
+          height: 400px;
+          border: none;
+          resize: vertical;
+          padding: 15px;
+          box-sizing: border-box;
+          background-color: #444;
+          color: #ffffff;
+          border-radius: 8px;
+          font-size: 1em;
+          transition: box-shadow 0.3s ease;
+      }
+  
+      .note-content textarea:focus {
+          outline: none;
+          box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+      }
+  
+      .note-actions {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+      }
+  
+      .note-actions button {
+          padding: 12px 20px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          background-color: #4a90e2;
+          color: white;
+          font-size: 1em;
+          transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s ease;
+      }
+  
+      .note-actions button:hover {
+          background-color: #3578c4;
+          transform: scale(1.05);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      }
+  
+      .note-actions button.delete {
+          background-color: #dc3545;
+      }
+  
+      .gradient-text {
+          background: linear-gradient(to right, #4a90e2, #e57373);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: bold;
+          font-size: 2em;
+          transition: transform 0.3s ease;
+      }
+      .gradient-text:hover {
+          transform: scale(1.03);
+      }
+  
+      button {
+          background-color: #4a90e2;
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s ease;
+          font-size: 1em;
+      }
+  
+      button:hover {
+          background-color: #3578c4;
+          transform: scale(1.05);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      }
+  
+      .content::before, .content::after {
+          content: '';
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          filter: blur(50px);
+          z-index: 0;
+          opacity: 0.2;
+          transition: opacity 0.3s ease;
+      }
+      .content:hover::before, .content:hover::after{
+          opacity: 0.3;
+      }
+  
+      .content::before {
+          top: -50px;
+          left: -50px;
+          background: radial-gradient(circle, rgba(74, 144, 226, 0.3), transparent);
+      }
+  
+      .content::after {
+          bottom: -50px;
+          right: -50px;
+          background: radial-gradient(circle, rgba(229, 115, 115, 0.3), transparent);
+      }
+  
+      .history-section {
+          margin-top: 30px;
+      }
+  
+      .history-section h2 {
+          color: #ffffff;
+          font-size: 1.5em;
+          margin-bottom: 20px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          transition: color 0.3s ease;
+      }
+      .history-section h2:hover {
+          color: #b0b0b0;
+      }
+  
+      .history-section ul {
+          list-style: none;
+          padding: 0;
+      }
+  
+      .history-section li {
+          padding: 15px 20px;
+          border-bottom: 1px solid #333;
+          color: #d0d0d0;
+          transition: background-color 0.3s, box-shadow 0.3s ease;
+          border-radius: 5px;
+          margin-bottom: 5px;
+      }
+  
+      .history-section li:hover {
+          background-color: #2a2a2a;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+  
+      .history-section li .date {
+          font-weight: bold;
+          color: #4a90e2;
+          margin-right: 10px;
+      }
+  </style>
+  </head>
+  <body ng-controller="NotesController">
+    <div class="container">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="journal.png" alt="Notes Logo" />
+          <span class="gradient-text">My Notes</span>
+        </div>
+        <ul class="note-list">
+          <li
+            ng-repeat="note in notes | filter:searchNote"
+            ng-click="selectNote(note)"
+            ng-class="{ 'active': selectedNote === note }"
+          >
+            {{ note.title }}
+          </li>
+        </ul>
+        <button ng-click="addNote()">Add New Note</button>
+        <a
+          href="journalling.html"
+          style="
+            display: block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+          "
+          >Back to Journaling</a
+        >
+      </aside>
+      <main class="content">
+        <header class="header">
+          <input
+            type="text"
+            placeholder="Search Notes"
+            class="search"
+            ng-model="searchNote"
+          />
+        </header>
+        <div class="note-content" ng-if="selectedNote">
+          <div class="note-actions">
+            <button ng-click="saveNote()">Save</button>
+            <button ng-click="deleteNote()" class="delete">Delete</button>
+          </div>
+          <input
+            type="text"
+            ng-model="selectedNote.title"
+            placeholder="Note Title"
+            style="
+              width: 100%;
+              margin-bottom: 10px;
+              background-color: #333;
+              color: white;
+              border: 1px solid #555;
+              padding: 5px;
+            "
+          />
+          <textarea ng-model="selectedNote.content"></textarea>
+        </div>
+        <div ng-if="!selectedNote">
+          <p style="color: #ffffff">Select a note or add a new one.</p>
+        </div>
+        <section class="history-section">
+          <h2>Journal History</h2>
+          <ul>
+            <li ng-repeat="entry in journalHistory">
+              <span class="date">{{ entry.date | date:'yyyy-MM-dd' }}</span> -
+              <span class="content">{{ entry.content }}</span>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <script>
+      angular
+        .module("notesApp", [])
+        .controller(
+          "NotesController",
+          function ($scope, $http, $window, $location) {
+            $scope.notes = [];
+            $scope.journalHistory = [];
+            $scope.selectedNote = null;
+            $scope.searchNote = "";
+
+            // **IMPORTANT:** Get the token from localStorage
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+              // Redirect to login page or handle unauthenticated state
+              console.log("No token found, redirect to login.");
+              // $window.location.href = '/login.html'; // Assuming you have a login page
+            }
+
+            const httpConfig = {
+              headers: {
+                Authorization: token,
+              },
+            };
+
+            function loadNotes() {
+              $http
+                .get("http://localhost:5000/notes", httpConfig)
+                .then((response) => {
+                  $scope.notes = response.data;
+                });
+            }
+
+            function loadJournalHistory() {
+              $http
+                .get("http://localhost:5000/journals", httpConfig)
+                .then((response) => {
+                  $scope.journalHistory = response.data;
+                });
+            }
+
+            function loadNote(noteId) {
+              $http
+                .get(`http://localhost:5000/notes/${noteId}`, httpConfig)
+                .then(
+                  (response) => {
+                    $scope.selectedNote = response.data;
+                  },
+                  (error) => {
+                    console.error("Error loading note:", error);
+                    // Handle error (e.g., display a message)
+                  }
+                );
+            }
+
+            loadNotes();
+            loadJournalHistory();
+
+            let journalId = $location.search().journalId;
+            let noteId = $location.search().noteId; // Get the noteId
+
+            if (journalId) {
+              $http
+                .get(`http://localhost:5000/journals/${journalId}`, httpConfig)
+                .then((response) => {
+                  let journalEntry = response.data;
+                  let newNote = {
+                    title: `Journal Entry ${new Date(
+                      journalEntry.date
+                    ).toLocaleDateString()}`,
+                    content: journalEntry.content,
+                    journalId: journalEntry._id,
+                  };
+                  $scope.notes.push(newNote);
+                  $scope.selectNote(newNote);
+                });
+            } else if (noteId) {
+              loadNote(noteId); // Load the specific note
+            }
+
+            $scope.selectNote = function (note) {
+              $scope.selectedNote = note;
+            };
+
+            $scope.addNote = function () {
+              let newNote = { title: "New Note", content: "" };
+              $scope.notes.push(newNote);
+              $scope.selectNote(newNote);
+            };
+
+            $scope.saveNote = function () {
+              if ($scope.selectedNote) {
+                let noteData = {
+                  title: $scope.selectedNote.title,
+                  content: $scope.selectedNote.content,
+                  journalId: $scope.selectedNote.journalId,
+                };
+                let request;
+                if ($scope.selectedNote._id) {
+                  request = $http.put(
+                    `http://localhost:5000/notes/${$scope.selectedNote._id}`,
+                    noteData,
+                    httpConfig
+                  );
+                } else {
+                  request = $http.post(
+                    "http://localhost:5000/notes",
+                    noteData,
+                    httpConfig
+                  );
+                }
+
+                request.then((response) => {
+                  alert("Note saved!");
+                  loadNotes(); // Reload notes to ensure $scope.notes is fully up-to-date
+                  $scope.selectNote(response.data); // Update the selected note with the full data from the server
+                });
+              }
+            };
+
+            $scope.deleteNote = function () {
+              if ($scope.selectedNote && $scope.selectedNote._id) {
+                $http
+                  .delete(
+                    `http://localhost:5000/notes/${$scope.selectedNote._id}`,
+                    httpConfig
+                  )
+                  .then(() => {
+                    let index = $scope.notes.indexOf($scope.selectedNote);
+                    $scope.notes.splice(index, 1);
+                    $scope.selectedNote = null;
+                    loadNotes();
+                  });
+              } else if ($scope.selectedNote) {
+                let index = $scope.notes.indexOf($scope.selectedNote);
+                $scope.notes.splice(index, 1);
+                $scope.selectedNote = null;
+              }
+            };
+          }
+        );
+    </script>
+  </body>
+</html>
